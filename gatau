@@ -1,0 +1,139 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+local GROUP_LINK = "https://contoh-website-anda.com"
+
+-- Hapus GUI lama jika ada
+if PlayerGui:FindFirstChild("StealAnEggGUI") then
+	PlayerGui.StealAnEggGUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "StealAnEggGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 360, 0, 220)
+Main.Position = UDim2.new(0.5, -180, 0.5, -110)
+Main.BackgroundColor3 = Color3.fromRGB(35, 25, 15)
+Main.BorderSizePixel = 0
+Main.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 12)
+Corner.Parent = Main
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(255, 215, 0)
+Stroke.Thickness = 2
+Stroke.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.BackgroundTransparency = 1
+Title.Text = "🥚 STEAL AN EGG"
+Title.TextColor3 = Color3.fromRGB(255, 220, 80)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
+Title.Parent = Main
+
+local Info = Instance.new("TextLabel")
+Info.Size = UDim2.new(0.9, 0, 0, 60)
+Info.Position = UDim2.new(0.05, 0, 0.28, 0)
+Info.BackgroundTransparency = 1
+Info.TextWrapped = true
+Info.TextScaled = true
+Info.Font = Enum.Font.Gotham
+Info.TextColor3 = Color3.new(1,1,1)
+Info.Text = "Agar skrip ini berfungsi, Anda harus bergabung dengan grup."
+Info.Parent = Main
+
+local CopyButton = Instance.new("TextButton")
+CopyButton.Size = UDim2.new(0.8, 0, 0, 40)
+CopyButton.Position = UDim2.new(0.1, 0, 0.68, 0)
+CopyButton.BackgroundColor3 = Color3.fromRGB(255, 190, 0)
+CopyButton.Text = "📋 Copy Link Grup"
+CopyButton.TextColor3 = Color3.new(0,0,0)
+CopyButton.Font = Enum.Font.GothamBold
+CopyButton.TextScaled = true
+CopyButton.Parent = Main
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0,8)
+ButtonCorner.Parent = CopyButton
+
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0,30,0,30)
+Close.Position = UDim2.new(1,-35,0,5)
+Close.BackgroundColor3 = Color3.fromRGB(220,60,60)
+Close.Text = "X"
+Close.TextColor3 = Color3.new(1,1,1)
+Close.Font = Enum.Font.GothamBold
+Close.TextScaled = true
+Close.Parent = Main
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(1,0)
+CloseCorner.Parent = Close
+
+Close.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
+CopyButton.MouseButton1Click:Connect(function()
+	if setclipboard then
+		setclipboard(GROUP_LINK)
+		CopyButton.Text = "✓ Link Disalin!"
+	else
+		CopyButton.Text = "Clipboard Tidak Didukung"
+	end
+	task.wait(2)
+	CopyButton.Text = "📋 Copy Link Grup"
+end)
+
+-- Draggable
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	Main.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = Main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+Main.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input == dragInput then
+		update(input)
+	end
+end)
